@@ -30,7 +30,6 @@
   }
 
   if (payload.role !== "admin") {
-    alert("Access denied: Admins only.");
     window.location.href = "/static/auth.html";
   }
 
@@ -42,7 +41,7 @@
   }
 
   async function loadUsers() {
-    const res = await fetch('/auth/admin-area/users', {
+    const res = await fetch('/auth/users', {
       headers: { Authorization: `Bearer ${token}` }
     });
     const users = await res.json();

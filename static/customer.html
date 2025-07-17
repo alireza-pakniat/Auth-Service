@@ -6,6 +6,11 @@
   if (!token) window.location.href = "/static/auth.html";
 
   const payload = JSON.parse(atob(token.split('.')[1]));
+  if (payload.role !== "customer") {
+    // Redirect non-customers (including admin) to login or their dashboard
+    window.location.href = "/static/auth.html";
+  }
+
   document.getElementById("welcome").innerText = `Welcome, ${payload.sub}`;
 
   function logout() {
