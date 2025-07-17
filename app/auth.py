@@ -6,6 +6,18 @@ from passlib.context import CryptContext
 from app.jwt_utils import create_access_token, verify_token
 from typing import List
 
+from sqlalchemy.orm import Session
+from app.database import SessionLocal, User as DBUser
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -46,22 +58,27 @@ def require_roles(roles: List[str]):
 
 
 @router.post("/register")
-def register(user: RegisterUser):
-    if user.username in users_db:
+def register(user: RegisterUser, db: Session = Depends(get_db)):
+    existing = db.query(DBUser).filter(DBUser.username == user.username).first()
+    if existing:
         raise HTTPException(status_code=400, detail="Username already registered")
+
     hashed_pw = pwd_context.hash(user.password)
-    users_db[user.username] = {"password": hashed_pw, "role": user.role}
+    db_user = DBUser(username=user.username, hashed_password=hashed_pw, role=user.role)
+    db.add(db_user)
+    db.commit()
     return {"msg": f"User '{user.username}' registered as '{user.role}'"}
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(user: User):
-    db_user = users_db.get(user.username)
-    if not db_user or not pwd_context.verify(user.password, db_user["password"]):
+def login(user: User, db: Session = Depends(get_db)):
+    db_user = db.query(DBUser).filter(DBUser.username == user.username).first()
+    if not db_user or not pwd_context.verify(user.password, db_user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    token = create_access_token({"sub": user.username, "role": db_user["role"]})
+    token = create_access_token({"sub": db_user.username, "role": db_user.role})
     return {"access_token": token, "token_type": "bearer"}
+
 
 @router.post("/logout")
 def logout():
