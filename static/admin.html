@@ -1,0 +1,15 @@
+<h1>Admin Dashboard</h1>
+<p id="welcome"></p>
+<button onclick="logout()">Logout</button>
+<script>
+  const token = localStorage.getItem('token');
+  if (!token) window.location.href = "/static/auth.html";
+
+  const payload = JSON.parse(atob(token.split('.')[1]));
+  document.getElementById("welcome").innerText = `Welcome, Admin ${payload.sub}`;
+
+  function logout() {
+    localStorage.removeItem('token');
+    window.location.href = "/static/auth.html";
+  }
+</script>

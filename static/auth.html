@@ -2,42 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Auth Demo</title>
+  <title>Auth</title>
 </head>
 <body>
-  <h1>Auth Service</h1>
+  <h1>Register</h1>
+  <input id="reg-username" placeholder="Username" />
+  <input id="reg-password" placeholder="Password" type="password" />
+  <select id="reg-role">
+    <option value="customer">Customer</option>
+    <option value="pharmacist">Pharmacist</option>
+    <option value="admin">Admin</option>
+  </select>
+  <button onclick="register()">Register</button>
+  <p id="reg-result"></p>
 
-  <div>
-    <h2>Register</h2>
-    <input id="reg-username" placeholder="Username" />
-    <input id="reg-password" placeholder="Password" type="password" />
-    <select id="reg-role">
-      <option value="user">User</option>
-      <option value="admin">Admin</option>
-    </select>
-    <button onclick="register()">Register</button>
-    <p id="reg-result"></p>
-  </div>
-
-  <div>
-    <h2>Login</h2>
-    <input id="login-username" placeholder="Username" />
-    <input id="login-password" placeholder="Password" type="password" />
-    <button onclick="login()">Login</button>
-    <p id="login-result"></p>
-  </div>
-
-  <div>
-    <h2>Logout</h2>
-    <button onclick="logout()">Logout</button>
-    <p id="logout-result"></p>
-  </div>
-
-  <div>
-    <h2>Admin Area</h2>
-    <button onclick="accessAdmin()">Access</button>
-    <p id="admin-result"></p>
-  </div>
+  <h1>Login</h1>
+  <input id="login-username" placeholder="Username" />
+  <input id="login-password" placeholder="Password" type="password" />
+  <button onclick="login()">Login</button>
+  <p id="login-result"></p>
 
   <script>
     let token = null;
@@ -70,27 +53,20 @@
       const data = await res.json();
       if (res.ok) {
         token = data.access_token;
-        document.getElementById('login-result').innerText = "Login successful!";
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const role = payload.role;
+        localStorage.setItem('token', token);
+
+        if (role === "admin") {
+          window.location.href = "/static/admin.html";
+        } else if (role === "pharmacist") {
+          window.location.href = "/static/pharmacist.html";
+        } else {
+          window.location.href = "/static/customer.html";
+        }
       } else {
         document.getElementById('login-result').innerText = data.detail;
       }
-    }
-
-    async function logout() {
-      token = null;
-      const res = await fetch('/auth/logout', { method: 'POST' });
-      const data = await res.json();
-      document.getElementById('logout-result').innerText = data.msg;
-    }
-
-    async function accessAdmin() {
-      const res = await fetch('/auth/admin-only', {
-        method: 'GET',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      const data = await res.json();
-      document.getElementById('admin-result').innerText = res.ok ? data.msg : data.detail;
     }
   </script>
 </body>

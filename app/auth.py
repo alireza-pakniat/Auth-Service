@@ -8,6 +8,7 @@ from typing import List
 
 from sqlalchemy.orm import Session
 from app.database import SessionLocal, User as DBUser
+from enum import Enum
 
 
 def get_db():
@@ -23,17 +24,24 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 users_db = {}  # Temporary in-memory user store
 
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
-class User(BaseModel):
-    username: str
-    password: str
+class RoleEnum(str, Enum):
+    admin = "admin"
+    customer = "customer"
+    pharmacist = "pharmacist"
 
 
 class RegisterUser(BaseModel):
     username: str
     password: str
-    role: str = "user"  # default role
+    role: RoleEnum = "customer"
+
+
+class User(BaseModel):
+    username: str
+    password: str
 
 
 class TokenResponse(BaseModel):
@@ -83,9 +91,14 @@ def login(user: User, db: Session = Depends(get_db)):
 @router.post("/logout")
 def logout():
     # In real JWT systems, client deletes token.
-    return {"msg": "Logout (client-side only, token will expire in time)"}
+    return {"msg": "Logout successful"}
 
 
 @router.get("/admin-only")
 def admin_area(user=Depends(require_roles(["admin"]))):
     return {"msg": f"Welcome admin {user['sub']}"}
+
+
+@router.get("/pharmacist-area")
+def pharmacist_area(user=Depends(require_roles(["pharmacist"]))):
+    return {"msg": f"Welcome pharmacist {user['sub']}"}
