@@ -7,17 +7,11 @@ from app.jwt_utils import create_access_token, verify_token
 from typing import List
 
 from sqlalchemy.orm import Session
-from app.database import SessionLocal, User as DBUser
+from app.database import SessionLocal, get_db
+from app.models import User as DBUser
 from enum import Enum
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
-        
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
