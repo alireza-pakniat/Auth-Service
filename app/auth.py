@@ -10,7 +10,6 @@ from sqlalchemy.orm import Session
 from app.database import SessionLocal, User as DBUser
 from enum import Enum
 
-
 def get_db():
     db = SessionLocal()
     try:
@@ -18,7 +17,7 @@ def get_db():
     finally:
         db.close()
 
-
+        
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -102,3 +101,36 @@ def admin_area(user=Depends(require_roles(["admin"]))):
 @router.get("/pharmacist-area")
 def pharmacist_area(user=Depends(require_roles(["pharmacist"]))):
     return {"msg": f"Welcome pharmacist {user['sub']}"}
+
+
+@router.get("/users", dependencies=[Depends(require_roles(["admin"]))])
+def list_users(db: Session = Depends(get_db)):
+    users = db.query(DBUser).all()
+    return [{"id": u.id, "username": u.username, "role": u.role} for u in users]
+
+
+class RoleChange(BaseModel):
+    username: str
+    new_role: str
+
+
+@router.put("/change-role", dependencies=[Depends(require_roles(["admin"]))])
+def change_user_role(data: RoleChange, db: Session = Depends(get_db)):
+    user = db.query(DBUser).filter(DBUser.username == data.username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.role = data.new_role
+    db.commit()
+    return {"msg": f"Role of '{user.username}' changed to '{user.role}'"}
+
+
+@router.delete(
+    "/delete-user/{username}", dependencies=[Depends(require_roles(["admin"]))]
+)
+def delete_user(username: str, db: Session = Depends(get_db)):
+    user = db.query(DBUser).filter(DBUser.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    db.delete(user)
+    db.commit()
+    return {"msg": f"User '{username}' deleted"}
