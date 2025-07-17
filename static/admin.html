@@ -42,7 +42,7 @@
   }
 
   async function loadUsers() {
-    const res = await fetch('/auth/users', {
+    const res = await fetch('/auth/admin-area/users', {
       headers: { Authorization: `Bearer ${token}` }
     });
     const users = await res.json();

@@ -87,7 +87,7 @@ def logout():
     return {"msg": "Logout successful"}
 
 
-@router.get("/admin-only")
+@router.get("/admin-area")
 def admin_area(user=Depends(require_roles(["admin"]))):
     return {"msg": f"Welcome admin {user['sub']}"}
 
@@ -95,6 +95,11 @@ def admin_area(user=Depends(require_roles(["admin"]))):
 @router.get("/pharmacist-area")
 def pharmacist_area(user=Depends(require_roles(["pharmacist"]))):
     return {"msg": f"Welcome pharmacist {user['sub']}"}
+
+
+@router.get("/customer-area")
+def customer_area(user=Depends(require_roles(["customer"]))):
+    return {"msg": f"Welcome customer {user['sub']}"}
 
 
 @router.get("/users", dependencies=[Depends(require_roles(["admin"]))])
