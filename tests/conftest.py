@@ -1,4 +1,4 @@
-# tests/conftest.py
+
 
 import pytest
 from fastapi.testclient import TestClient
@@ -9,9 +9,9 @@ from app.main import app
 from app.database import Base, get_db
 from app import models
 
-# Create a separate test database (in-memory or file-based)
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"  # For persistent test DB
-# SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"  # For in-memory (optional)
+
+SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"  
+
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
@@ -19,7 +19,7 @@ engine = create_engine(
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-# ✅ Override the dependency
+
 def override_get_db():
     db = TestingSessionLocal()
     try:
@@ -28,11 +28,11 @@ def override_get_db():
         db.close()
 
 
-# ✅ Apply override before tests run
+
 app.dependency_overrides[get_db] = override_get_db
 
 
-# ✅ Fixture to initialize and clean DB
+
 @pytest.fixture(scope="session", autouse=True)
 def setup_test_db():
     Base.metadata.drop_all(bind=engine)
@@ -41,7 +41,7 @@ def setup_test_db():
     Base.metadata.drop_all(bind=engine)
 
 
-# ✅ Fixture to provide a test client
+
 @pytest.fixture()
 def client():
     return TestClient(app)

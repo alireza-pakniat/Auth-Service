@@ -2,7 +2,7 @@
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 
-# Secret key for signing tokens (use a secure, random one in production!)
+# Secret key for signing tokens 
 SECRET_KEY = "supersecretkey"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
