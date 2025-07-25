@@ -2,25 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Auth</title>
+  <title>Authentication</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Register</h1>
-  <input id="reg-username" placeholder="Username" />
-  <input id="reg-password" placeholder="Password" type="password" />
-  <select id="reg-role">
-    <option value="customer">Customer</option>
-    <option value="pharmacist">Pharmacist</option>
-    <option value="admin">Admin</option>
-  </select>
-  <button onclick="register()">Register</button>
-  <p id="reg-result"></p>
 
-  <h1>Login</h1>
-  <input id="login-username" placeholder="Username" />
-  <input id="login-password" placeholder="Password" type="password" />
-  <button onclick="login()">Login</button>
-  <p id="login-result"></p>
+  <div class="container">
+    <h1>Register</h1>
+    <input id="reg-username" type="text" placeholder="Username" />
+    <input id="reg-password" type="password" placeholder="Password" />
+    <select id="reg-role">
+      <option value="customer">Customer</option>
+      <option value="pharmacist">Pharmacist</option>
+      <option value="admin">Admin</option>
+    </select>
+    <button onclick="register()">Register</button>
+    <p id="reg-result"></p>
+
+    <h1>Login</h1>
+    <input id="login-username" type="text" placeholder="Username" />
+    <input id="login-password" type="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+    <p id="login-result"></p>
+  </div>
 
   <script>
     let token = null;

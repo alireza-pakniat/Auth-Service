@@ -1,20 +1,33 @@
-<h1>Customer Dashboard</h1>
-<p id="welcome"></p>
-<button onclick="logout()">Logout</button>
-<script>
-  const token = localStorage.getItem('token');
-  if (!token) window.location.href = "/static/auth.html";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-  const payload = JSON.parse(atob(token.split('.')[1]));
-  if (payload.role !== "customer") {
-    // Redirect non-customers (including admin) to login or their dashboard
-    window.location.href = "/static/auth.html";
-  }
+    <div class="container">
+        <h1>Customer Dashboard</h1>
+        <p id="welcome"></p>
+        <button onclick="logout()" class="logout-btn">Logout</button>
+    </div>
 
-  document.getElementById("welcome").innerText = `Welcome, ${payload.sub}`;
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = "/static/auth.html";
 
-  function logout() {
-    localStorage.removeItem('token');
-    window.location.href = "/static/auth.html";
-  }
-</script>
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload.role !== "customer") {
+            window.location.href = "/static/auth.html";
+        }
+
+        document.getElementById("welcome").innerText = `Welcome, ${payload.sub}`;
+
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = "/static/auth.html";
+        }
+    </script>
+</body>
+</html>
